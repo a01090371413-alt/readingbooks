@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>독서정원</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F1ECDB;
+    --paper-card:#FFFFFB;
+    --ink:#23301F;
+    --ink-soft:#5B6656;
+    --forest:#2F4A38;
+    --forest-dark:#1F3327;
+    --sage:#8AA17E;
+    --sage-line:#C6D2BC;
+    --moss-light:#E3E9D9;
+    --gold:#D99A3D;
+    --gold-soft:#F3DDAF;
+    --radius-lg:22px;
+    --radius-md:16px;
+    --radius-sm:10px;
+    --shadow:0 10px 24px -14px rgba(35,48,31,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Work Sans', -apple-system, sans-serif;
+    background:
+      radial-gradient(circle at 15% 0%, rgba(138,161,126,0.18), transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .app-shell{
+    max-width:430px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    padding-bottom:28px;
+  }
+
+  /* Header */
+  .app-header{
+    padding:26px 22px 6px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .app-header .mark{
+    width:34px;height:34px;flex:none;
+  }
+  .app-header h1{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:22px;
+    margin:0;
+    letter-spacing:-0.01em;
+    color:var(--forest-dark);
+  }
+  .app-header p{
+    margin:0;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  /* Banner nav */
+  .banner-nav{
+    display:flex;
+    gap:10px;
+    padding:14px 18px 4px;
+  }
+  .banner-btn{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:7px;
+    padding:14px 6px 12px;
+    border-radius:18px;
+    border:1px solid var(--sage-line);
+    background:var(--paper-card);
+    cursor:pointer;
+    transition:transform .15s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+    -webkit-tap-highlight-color:transparent;
+    text-align:center;
+  }
+  .banner-btn:active{ transform:scale(0.96); }
+  .banner-btn svg{ width:26px; height:26px; color:var(--forest); }
+  .banner-btn span{
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    line-height:1.25;
+  }
+  .banner-btn.active{
+    background:var(--forest);
+    border-color:var(--forest);
+    box-shadow:var(--shadow);
+  }
+  .banner-btn.active svg{ color:var(--gold-soft); }
+  .banner-btn.active span{ color:#F4F1E6; }
+
+  /* Pages */
+  .page{ display:none; padding:20px 20px 10px; animation:fadeIn .35s ease; }
+  .page.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .page-title{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:23px;
+    line-height:1.35;
+    color:var(--forest-dark);
+    margin:4px 0 18px;
+    letter-spacing:-0.01em;
+  }
+
+  .card{
+    background:var(--paper-card);
+    border:1px solid var(--sage-line);
+    border-radius:var(--radius-lg);
+    padding:20px;
+    box-shadow:var(--shadow);
+  }
+  .card + .card{ margin-top:14px; }
+
+  /* Page 1: form */
+  label.field-label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin:0 0 6px 2px;
+  }
+  .field{ margin-bottom:16px; }
+  .input-row{
+    display:flex;
+    align-items:center;
+    background:var(--moss-light);
+    border-radius:var(--radius-md);
+    border:1px solid var(--sage-line);
+    overflow:hidden;
+  }
+  .input-row input{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:13px 14px;
+    font-size:16px;
+    font-family:inherit;
+    color:var(--ink);
+    outline:none;
+    min-width:0;
+  }
+  .input-row .unit{
+    padding:0 14px;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  .goal-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:var(--forest);
+    background:var(--moss-light);
+    border-radius:999px;
+    padding:5px 12px;
+    margin-bottom:16px;
+    font-weight:600;
+  }
+  .goal-chip button{
+    border:none;
+    background:none;
+    color:var(--sage);
+    font-size:11px;
+    text-decoration:underline;
+    cursor:pointer;
+    font-family:inherit;
+    padding:0;
+  }
+  .btn-primary{
+    width:100%;
+    border:none;
+    background:var(--forest);
+    color:#F4F1E6;
+    font-family:'Work Sans', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    padding:14px;
+    border-radius:var(--radius-md);
+    cursor:pointer;
+    transition:transform .12s ease, background .2s ease;
+  }
+  .btn-primary:active{ transform:scale(0.98); background:var(--forest-dark); }
+
+  .feedback-box{
+    margin-top:16px;
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    background:var(--moss-light);
+    border-radius:var(--radius-md);
+    padding:16px;
+    border:1px solid var(--sage-line);
+  }
+  .feedback-box svg{ width:36px; height:36px; flex:none; color:var(--forest); margin-top:2px;}
+  .feedback-box .fb-title{ font-weight:700; font-size:14.5px; color:var(--forest-dark); margin:0 0 4px; }
+  .feedback-box .fb-desc{ font-size:13px; color:var(--ink-soft); line-height:1.5; margin:0; }
+
+  .today-note{
+    font-size:12px;
+    color:var(--ink-soft);
+    margin-top:10px;
+    text-align:center;
+  }
+
+  /* Page 2: calendar */
+  .month-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .month-nav .m-btn{
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:50%;
+    border:1px solid var(--sage-line);
+    background:var(--paper-card);
+    color:var(--forest);
+    cursor:pointer;
+    flex:none;
+  }
+  .month-nav .m-btn:active{ background:var(--moss-light); }
+  .month-nav .m-label{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--forest-dark);
+  }
+
+  .legend{
+    display:flex;
+    justify-content:space-between;
+    gap:6px;
+    margin-bottom:16px;
+    padding:0 2px;
+  }
+  .legend .lg-item{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:4px;
+    font-size:10px;
+    color:var(--ink-soft);
+    font-weight:600;
+    flex:1;
+  }
+  .legend svg{ width:20px; height:20px; color:var(--forest); }
+
+  .cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:6px;
+  }
+  .cal-dow{
+    text-align:center;
+    font-size:11px;
+    font-weight:700;
+    color:var(--sage);
+    padding-bottom:4px;
+  }
+  .cal-cell{
+    aspect-ratio:1/1;
+    border-radius:12px;
+    background:var(--moss-light);
+    border:1px solid transparent;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    position:relative;
+  }
+  .cal-cell.empty{ background:transparent; }
+  .cal-cell.today{ border-color:var(--gold); }
+  .cal-cell .d-num{
+    font-size:10px;
+    font-weight:600;
+    color:var(--ink-soft);
+    position:absolute;
+    top:4px;
+    left:6px;
+  }
+  .cal-cell svg{ width:20px; height:20px; color:var(--forest); margin-top:4px; }
+  .cal-cell.no-record svg{ color:var(--sage-line); }
+
+  /* Page 3: stats */
+  .stat-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .stat-card{
+    background:var(--paper-card);
+    border:1px solid var(--sage-line);
+    border-radius:var(--radius-md);
+    padding:16px 14px;
+    box-shadow:var(--shadow);
+  }
+  .stat-card .s-label{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin:0 0 6px;
+  }
+  .stat-card .s-value{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:22px;
+    color:var(--forest-dark);
+    margin:0;
+  }
+  .stat-card .s-value small{ font-size:13px; font-weight:600; color:var(--ink-soft); }
+
+  .streak-card{
+    margin-top:16px;
+    background:linear-gradient(135deg, var(--forest) 0%, var(--forest-dark) 100%);
+    border-radius:var(--radius-lg);
+    padding:20px;
+    color:#F4F1E6;
+    box-shadow:var(--shadow);
+  }
+  .streak-card .st-top{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .streak-card svg.fire{ width:38px; height:38px; color:var(--gold-soft); flex:none; }
+  .streak-card .st-num{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:30px;
+    line-height:1;
+  }
+  .streak-card .st-num small{ font-size:14px; font-weight:600; opacity:.85; margin-left:2px; }
+  .streak-card .st-desc{
+    font-size:12.5px;
+    opacity:.85;
+    margin:8px 0 0;
+    line-height:1.5;
+  }
+
+  .empty-hint{
+    text-align:center;
+    padding:30px 10px;
+    color:var(--ink-soft);
+    font-size:13px;
+    line-height:1.6;
+  }
+  .empty-hint svg{ width:40px; height:40px; color:var(--sage); margin-bottom:10px; }
+
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="app-header">
+    <svg class="mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 35C20 35 8 30 8 18C8 10 14 5 20 5C26 5 32 10 32 18C32 30 20 35 20 35Z" fill="#2F4A38"/>
+      <path d="M20 35V16" stroke="#F3DDAF" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M20 22C20 22 15 21 15 16C15 12 17.5 10 20 10" stroke="#F3DDAF" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    </svg>
+    <div>
+      <h1>독서정원</h1>
+      <p>매일의 독서가 자라나는 곳</p>
+    </div>
+  </div>
+
+  <div class="banner-nav" id="bannerNav">
+    <button class="banner-btn" data-page="1">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11V20H5.5C4.7 20 4 19.3 4 18.5V5.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M20 5.5C20 4.7 19.3 4 18.5 4H13V20H18.5C19.3 20 20 19.3 20 18.5V5.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span>오늘의 독서</span>
+    </button>
+    <button class="banner-btn" data-page="2">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 21C12 21 5 17 5 10.5C5 6.4 8.1 3.5 12 3.5C15.9 3.5 19 6.4 19 10.5C19 17 12 21 12 21Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 21V8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <span>독서정원</span>
+    </button>
+    <button class="banner-btn" data-page="3">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 20V13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M10 20V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 20V4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M20 20V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>독서 평균</span>
+    </button>
+  </div>
+
+  <!-- PAGE 1 -->
+  <div class="page" id="page1">
+    <h2 class="page-title">오늘 당신의 독서는<br>어땠나요?</h2>
+
+    <div class="card">
+      <div id="goalDisplayWrap"></div>
+      <div id="goalInputWrap"></div>
+
+      <div class="field" id="todayFieldWrap" style="display:none;">
+        <label class="field-label">오늘 독서 시간</label>
+        <div class="input-row">
+          <input type="number" id="todayInput" min="0" placeholder="예: 40" inputmode="numeric">
+          <span class="unit">분</span>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="saveBtn" style="display:none;">기록하기</button>
+      <div id="feedbackWrap"></div>
+      <p class="today-note" id="todayNote"></p>
+    </div>
+  </div>
+
+  <!-- PAGE 2 -->
+  <div class="page" id="page2">
+    <h2 class="page-title">당신의 독서정원</h2>
+    <div class="card" id="gardenCard">
+      <div class="month-nav">
+        <button class="m-btn" id="prevMonthBtn" aria-label="이전 달">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="m-label" id="monthLabel2"></span>
+        <button class="m-btn" id="nextMonthBtn" aria-label="다음 달">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div class="legend">
+        <div class="lg-item" id="iconSeedLegend"><span>씨앗</span></div>
+        <div class="lg-item" id="iconSproutLegend"><span>새싹</span></div>
+        <div class="lg-item" id="iconLeafLegend"><span>이파리</span></div>
+        <div class="lg-item" id="iconTreeLegend"><span>나무</span></div>
+      </div>
+
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+  <!-- PAGE 3 -->
+  <div class="page" id="page3">
+    <h2 class="page-title">이번달 독서 평균을<br>살펴볼까요?</h2>
+
+    <div class="month-nav" style="padding:0 2px 4px;">
+      <button class="m-btn" id="prevMonthBtn3" aria-label="이전 달">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="m-label" id="monthLabel3"></span>
+      <button class="m-btn" id="nextMonthBtn3" aria-label="다음 달">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card">
+        <p class="s-label">총 독서시간</p>
+        <p class="s-value" id="statTotal">-</p>
+      </div>
+      <div class="stat-card">
+        <p class="s-label">평균 독서시간</p>
+        <p class="s-value" id="statAvg">-</p>
+      </div>
+      <div class="stat-card">
+        <p class="s-label">목표 달성률</p>
+        <p class="s-value" id="statRate">-</p>
+      </div>
+      <div class="stat-card">
+        <p class="s-label">기록 일수</p>
+        <p class="s-value" id="statDays">-</p>
+      </div>
+    </div>
+
+    <div class="streak-card">
+      <div class="st-top">
+        <svg class="fire" viewBox="0 0 24 24" fill="none"><path d="M12 22C7.6 22 5 18.9 5 15.4C5 11.6 8.3 8.7 8 5C8 5 12.5 6.6 12.5 11.5C13.6 10.4 13.8 8.6 13.6 7.3C16.4 9 18 12.1 18 15.4C18 18.9 16.4 22 12 22Z" fill="currentColor"/></svg>
+        <div class="st-num" id="streakNum">0<small>일째</small></div>
+      </div>
+      <p class="st-desc" id="streakDesc">아직 연속 기록이 없어요. 오늘부터 시작해볼까요?</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- Icons (inline SVG markup) ---------- */
+  const ICONS = {
+    seed: '<svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="13" rx="5" ry="7" fill="currentColor" opacity="0.85"/><path d="M12 6C12 6 10.5 4 8 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+    sprout: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 21V12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 13C12 13 6 12.5 6 7C6 7 12 6.5 12 13Z" fill="currentColor" opacity="0.85"/><path d="M12 15C12 15 17 14.5 17 10C17 10 12 9.5 12 15Z" fill="currentColor" opacity="0.6"/></svg>',
+    leaf: '<svg viewBox="0 0 24 24" fill="none"><path d="M6 18C6 9 12 4 19 3C19 11 15 18 6 18Z" fill="currentColor" opacity="0.85"/><path d="M6 18C9 15 12 11 17 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/></svg>',
+    tree: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 21V14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="9" r="6" fill="currentColor" opacity="0.85"/></svg>'
+  };
+  document.getElementById('iconSeedLegend').insertAdjacentHTML('afterbegin', ICONS.seed);
+  document.getElementById('iconSproutLegend').insertAdjacentHTML('afterbegin', ICONS.sprout);
+  document.getElementById('iconLeafLegend').insertAdjacentHTML('afterbegin', ICONS.leaf);
+  document.getElementById('iconTreeLegend').insertAdjacentHTML('afterbegin', ICONS.tree);
+
+  /* ---------- Data layer (localStorage) ---------- */
+  const STORAGE_KEY = 'reading-garden-v1';
+
+  function loadData(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return { goalMinutes:null, records:{} };
+      const parsed = JSON.parse(raw);
+      return { goalMinutes: parsed.goalMinutes ?? null, records: parsed.records || {} };
+    }catch(e){
+      return { goalMinutes:null, records:{} };
+    }
+  }
+  function saveData(data){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+  let store = loadData();
+
+  function todayStr(){
+    const d = new Date();
+    return fmtDate(d);
+  }
+  function fmtDate(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
+  /* ---------- Stage helper ----------
+     0 = seed, 0<x<goal = sprout, x==goal = leaf, x>goal = tree  */
+  function stageFor(minutes, goal){
+    if(minutes === undefined || minutes === null) return null;
+    if(minutes <= 0) return 'seed';
+    if(minutes < goal) return 'sprout';
+    if(minutes === goal) return 'leaf';
+    return 'tree';
+  }
+
+  /* ================= PAGE NAV ================= */
+  const banners = document.querySelectorAll('.banner-btn');
+  const pages = { 1: document.getElementById('page1'), 2: document.getElementById('page2'), 3: document.getElementById('page3') };
+
+  function goToPage(n){
+    Object.keys(pages).forEach(k => pages[k].classList.toggle('active', Number(k)===n));
+    banners.forEach(b => b.classList.toggle('active', Number(b.dataset.page)===n));
+    if(n===2) renderCalendar();
+    if(n===3) renderStats();
+  }
+  banners.forEach(b => b.addEventListener('click', () => goToPage(Number(b.dataset.page))));
+
+  /* ================= PAGE 1 ================= */
+  const goalDisplayWrap = document.getElementById('goalDisplayWrap');
+  const goalInputWrap = document.getElementById('goalInputWrap');
+  const todayFieldWrap = document.getElementById('todayFieldWrap');
+  const todayInput = document.getElementById('todayInput');
+  const saveBtn = document.getElementById('saveBtn');
+  const feedbackWrap = document.getElementById('feedbackWrap');
+  const todayNote = document.getElementById('todayNote');
+
+  function renderPage1(){
+    feedbackWrap.innerHTML = '';
+    if(store.goalMinutes === null){
+      // ask for goal
+      goalDisplayWrap.innerHTML = '';
+      goalInputWrap.innerHTML = `
+        <div class="field">
+          <label class="field-label">목표 독서 시간</label>
+          <div class="input-row">
+            <input type="number" id="goalInput" min="1" placeholder="예: 30" inputmode="numeric">
+            <span class="unit">분</span>
+          </div>
+        </div>`;
+      todayFieldWrap.style.display = 'none';
+      saveBtn.style.display = 'block';
+      saveBtn.textContent = '목표 설정하기';
+      todayNote.textContent = '';
+      saveBtn.onclick = () => {
+        const v = Number(document.getElementById('goalInput').value);
+        if(!v || v <= 0){ shake('goalInput'); return; }
+        store.goalMinutes = v;
+        saveData(store);
+        renderPage1();
+      };
+    } else {
+      goalInputWrap.innerHTML = '';
+      goalDisplayWrap.innerHTML = `
+        <div class="goal-chip">
+          🎯 오늘의 목표 ${store.goalMinutes}분
+          <button id="changeGoalBtn" type="button">변경</button>
+        </div>`;
+      document.getElementById('changeGoalBtn').onclick = () => {
+        store.goalMinutes = null;
+        saveData(store);
+        renderPage1();
+      };
+      todayFieldWrap.style.display = 'block';
+      const existing = store.records[todayStr()];
+      todayInput.value = (existing !== undefined) ? existing : '';
+      saveBtn.style.display = 'block';
+      saveBtn.textContent = '기록하기';
+      todayNote.textContent = existing !== undefined ? '오늘 이미 기록한 시간이 있어요. 다시 저장하면 갱신돼요.' : '';
+      saveBtn.onclick = () => {
+        const v = todayInput.value;
+        if(v === '' || Number(v) < 0){ shake('todayInput'); return; }
+        const minutes = Number(v);
+        store.records[todayStr()] = minutes;
+        saveData(store);
+        showFeedback(minutes, store.goalMinutes);
+        todayNote.textContent = '오늘 이미 기록한 시간이 있어요. 다시 저장하면 갱신돼요.';
+      };
+      // show feedback if already recorded today
+      if(existing !== undefined){
+        showFeedback(existing, store.goalMinutes);
+      }
+    }
+  }
+
+  function shake(id){
+    const el = document.getElementById(id);
+    el.style.transition = 'transform .08s';
+    el.style.transform = 'translateX(-4px)';
+    setTimeout(()=>{ el.style.transform='translateX(4px)'; },80);
+    setTimeout(()=>{ el.style.transform='translateX(0)'; },160);
+  }
+
+  function showFeedback(minutes, goal){
+    const stage = stageFor(minutes, goal);
+    const map = {
+      seed:   { title: '오늘은 씨앗을 심었어요', desc: '아직 독서를 시작하지 않았어요. 짧게라도 한 페이지 넘겨볼까요?' },
+      sprout: { title: '새싹이 돋아나고 있어요', desc: `목표까지 ${goal - minutes}분 남았어요. 조금만 더 힘내볼까요?` },
+      leaf:   { title: '오늘 목표를 딱 채웠어요', desc: '이파리가 피어났어요. 꾸준함이 정원을 가꾸고 있어요.' },
+      tree:   { title: '목표를 훌쩍 넘겼어요', desc: `목표보다 ${minutes - goal}분 더 읽었어요. 나무가 무럭무럭 자라고 있어요.` }
+    };
+    const info = map[stage];
+    feedbackWrap.innerHTML = `
+      <div class="feedback-box">
+        ${ICONS[stage]}
+        <div>
+          <p class="fb-title">${info.title}</p>
+          <p class="fb-desc">${info.desc}</p>
+        </div>
+      </div>`;
+  }
+
+  /* ================= PAGE 2: calendar ================= */
+  let viewYear, viewMonth; // shared between page2 & page3 (0-indexed month)
+  (function initView(){
+    const d = new Date();
+    viewYear = d.getFullYear();
+    viewMonth = d.getMonth();
+  })();
+
+  const DOW = ['일','월','화','수','목','금','토'];
+
+  function daysInMonth(y,m){ return new Date(y, m+1, 0).getDate(); }
+
+  function renderCalendar(){
+    const monthLabel2 = document.getElementById('monthLabel2');
+    monthLabel2.textContent = `${viewYear}년 ${viewMonth+1}월`;
+
+    const grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
+
+    DOW.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-dow';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    const firstDow = new Date(viewYear, viewMonth, 1).getDay();
+    const total = daysInMonth(viewYear, viewMonth);
+    const todayS = todayStr();
+
+    for(let i=0;i<firstDow;i++){
+      const el = document.createElement('div');
+      el.className = 'cal-cell empty';
+      grid.appendChild(el);
+    }
+
+    for(let day=1; day<=total; day++){
+      const dateObj = new Date(viewYear, viewMonth, day);
+      const key = fmtDate(dateObj);
+      const val = store.records[key];
+      const stage = (store.goalMinutes !== null) ? stageFor(val, store.goalMinutes) : null;
+
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell' + (key===todayS ? ' today' : '') + (stage===null ? ' no-record' : '');
+      const num = document.createElement('span');
+      num.className = 'd-num';
+      num.textContent = day;
+      cell.appendChild(num);
+
+      if(stage){
+        const iconWrap = document.createElement('div');
+        iconWrap.innerHTML = ICONS[stage];
+        cell.appendChild(iconWrap.firstChild);
+      } else {
+        const iconWrap = document.createElement('div');
+        iconWrap.innerHTML = ICONS.seed;
+        iconWrap.firstChild.style.opacity = '0.25';
+        cell.appendChild(iconWrap.firstChild);
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  document.getElementById('prevMonthBtn').addEventListener('click', () => { changeMonth(-1); });
+  document.getElementById('nextMonthBtn').addEventListener('click', () => { changeMonth(1); });
+  document.getElementById('prevMonthBtn3').addEventListener('click', () => { changeMonth(-1); });
+  document.getElementById('nextMonthBtn3').addEventListener('click', () => { changeMonth(1); });
+
+  function changeMonth(delta){
+    viewMonth += delta;
+    if(viewMonth < 0){ viewMonth = 11; viewYear--; }
+    if(viewMonth > 11){ viewMonth = 0; viewYear++; }
+    renderCalendar();
+    renderStats();
+  }
+
+  /* ================= PAGE 3: stats ================= */
+  function renderStats(){
+    document.getElementById('monthLabel3').textContent = `${viewYear}년 ${viewMonth+1}월`;
+
+    const total = daysInMonth(viewYear, viewMonth);
+    let sum = 0, count = 0, achieved = 0;
+    const goal = store.goalMinutes;
+
+    for(let day=1; day<=total; day++){
+      const key = fmtDate(new Date(viewYear, viewMonth, day));
+      const v = store.records[key];
+      if(v !== undefined){
+        sum += v;
+        count++;
+        if(goal !== null && v >= goal) achieved++;
+      }
+    }
+
+    const avg = count > 0 ? Math.round(sum / count) : 0;
+    const rate = count > 0 && goal !== null ? Math.round((achieved / count) * 100) : 0;
+
+    document.getElementById('statTotal').innerHTML = `${sum}<small>분</small>`;
+    document.getElementById('statAvg').innerHTML = `${avg}<small>분</small>`;
+    document.getElementById('statRate').innerHTML = goal !== null ? `${rate}<small>%</small>` : `-`;
+    document.getElementById('statDays').innerHTML = `${count}<small>일</small>`;
+
+    // streak: consecutive days up to today (or most recent past day) meeting/exceeding goal
+    const streakNumEl = document.getElementById('streakNum');
+    const streakDescEl = document.getElementById('streakDesc');
+
+    if(goal === null){
+      streakNumEl.innerHTML = `0<small>일째</small>`;
+      streakDescEl.textContent = '목표를 먼저 설정하면 연속 달성 기록을 볼 수 있어요.';
+      return;
+    }
+
+    let streak = 0;
+    let cursor = new Date();
+    // if today not yet recorded, start counting from yesterday
+    if(store.records[fmtDate(cursor)] === undefined){
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    while(true){
+      const key = fmtDate(cursor);
+      const v = store.records[key];
+      if(v !== undefined && v >= goal){
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    streakNumEl.innerHTML = `${streak}<small>일째</small>`;
+    streakDescEl.textContent = streak > 0
+      ? `${streak}일 연속으로 목표를 달성하고 있어요. 이 기세를 이어가볼까요?`
+      : '아직 연속 기록이 없어요. 오늘부터 시작해볼까요?';
+  }
+
+  /* ---------- init ---------- */
+  renderPage1();
+  goToPage(1);
+})();
+</script>
+</body>
+</html>
